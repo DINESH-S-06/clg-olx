@@ -28,6 +28,7 @@ export default function Navbar({
   favoritesCount = 0,
   showFavoritesOnly = false,
   onToggleFavoritesView,
+  onSearchSubmit,
 }) {
   const [locationOpen, setLocationOpen] = useState(false);
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
@@ -142,13 +143,24 @@ export default function Navbar({
             )}
           </div>
 
-          {/* Main Search Bar */}
-          <div className="flex-1 flex items-stretch max-w-xl">
+          {/* Main Search Bar Form */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (onSearchSubmit) onSearchSubmit(search);
+            }}
+            className="flex-1 flex items-stretch max-w-xl"
+          >
             <div className="relative flex-1">
               <input
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  if (showFavoritesOnly && onToggleFavoritesView) {
+                    onToggleFavoritesView();
+                  }
+                }}
                 placeholder="Find Books, Laptops, Drafters, Cycles..."
                 className="w-full h-11 pl-4 pr-9 bg-slate-50 hover:bg-white focus:bg-white border border-r-0 border-slate-200 focus:border-[#002f34] rounded-l-xl text-xs sm:text-sm font-medium text-[#002f34] placeholder-slate-400 outline-none transition-all"
               />
@@ -164,14 +176,13 @@ export default function Navbar({
               )}
             </div>
             <button
-              type="button"
-              onClick={() => {}}
+              type="submit"
               className="w-11 sm:w-12 h-11 bg-[#002f34] hover:bg-[#00474f] active:scale-98 text-white flex items-center justify-center rounded-r-xl transition-all cursor-pointer shrink-0 shadow-xs"
               title="Search"
             >
               <Search className="w-4 h-4 stroke-[2.5]" />
             </button>
-          </div>
+          </form>
 
           {/* Saved Favorites Heart Toggle Button */}
           <button

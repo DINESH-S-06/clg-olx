@@ -332,7 +332,14 @@ export default function App() {
         onOpenAuthModal={() => setShowLoginGateway(true)}
         onLogout={handleLogout}
         search={search}
-        setSearch={setSearch}
+        setSearch={(val) => {
+          setSearch(val);
+          if (showFavoritesOnly) setShowFavoritesOnly(false);
+        }}
+        onSearchSubmit={() => {
+          setShowFavoritesOnly(false);
+          loadProducts();
+        }}
         locationFilter={locationFilter}
         setLocationFilter={setLocationFilter}
         category={category}
@@ -409,17 +416,32 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="text-2xl sm:text-3xl font-black text-[#002f34] tracking-tight">
-                      Fresh recommendations
+                      {search.trim() ? `Search: "${search.trim()}"` : 'Fresh recommendations'}
                     </h2>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      Live
+                      {search.trim() ? `${displayedProducts.length} Results` : 'Live'}
                     </span>
                   </div>
-                  {category !== 'All' && (
+                  {search.trim() ? (
+                    <div className="flex items-center gap-2.5 mt-1 text-xs text-slate-500 font-medium">
+                      <span>
+                        Showing ads matching <strong className="text-[#002f34]">"{search.trim()}"</strong>
+                        {category !== 'All' && <span> in <strong>{category}</strong></span>}
+                      </span>
+                      <span>•</span>
+                      <button
+                        type="button"
+                        onClick={() => setSearch('')}
+                        className="text-xs font-bold text-rose-600 hover:text-rose-700 hover:underline cursor-pointer"
+                      >
+                        Clear Search
+                      </button>
+                    </div>
+                  ) : category !== 'All' ? (
                     <p className="text-xs text-slate-500 font-medium mt-1">
                       Filtering by category: <span className="font-bold text-[#002f34]">{category}</span>
                     </p>
-                  )}
+                  ) : null}
                 </div>
 
                 {/* Quick Filters: Condition & Sort */}
@@ -524,17 +546,23 @@ export default function App() {
               </div>
               <div>
                 <h3 className="text-lg font-black text-[#002f34]">
-                  {showFavoritesOnly ? 'No saved favorites yet' : 'Oops... No ads found'}
+                  {showFavoritesOnly
+                    ? 'No saved favorites yet'
+                    : search.trim()
+                    ? `No ads matching "${search.trim()}"`
+                    : 'Oops... No ads found'}
                 </h3>
                 <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed max-w-xs mx-auto">
                   {showFavoritesOnly
                     ? 'Click the heart icon on any ad card to save it here for later.'
-                    : search || category !== 'All'
-                    ? 'Try changing your search keywords or switching category to All.'
+                    : search.trim()
+                    ? 'Try checking for typos, using broader keywords, or clearing your search.'
+                    : category !== 'All'
+                    ? 'Try switching category to All to see other campus listings.'
                     : 'Be the first student to post an ad in this category!'}
                 </p>
               </div>
-              <div className="pt-2">
+              <div className="pt-2 flex items-center justify-center gap-2">
                 {showFavoritesOnly ? (
                   <button
                     onClick={() => setShowFavoritesOnly(false)}
@@ -542,6 +570,21 @@ export default function App() {
                   >
                     Browse All Ads
                   </button>
+                ) : search.trim() ? (
+                  <>
+                    <button
+                      onClick={() => setSearch('')}
+                      className="px-4 py-2.5 text-xs font-bold text-teal-900 bg-teal-50 hover:bg-teal-100 rounded-xl transition-colors cursor-pointer"
+                    >
+                      Clear Search
+                    </button>
+                    <button
+                      onClick={handleOpenSell}
+                      className="px-5 py-2.5 text-xs font-bold text-[#002f34] bg-[#ffce32] hover:bg-[#ffd753] rounded-xl transition-all shadow-xs cursor-pointer"
+                    >
+                      Post an Ad
+                    </button>
+                  </>
                 ) : (
                   <button
                     onClick={handleOpenSell}

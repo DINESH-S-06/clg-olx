@@ -22,12 +22,22 @@ router.get('/', async (req, res) => {
 
     const filter = {};
 
-    // 1. Text Search filter (matches title or description)
+    // Safe Regex Escaping to prevent syntax crashes on special characters (e.g. C++, parentheses, ?, etc.)
+    const escapeRegex = (text) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+
+    // 1. Text Search filter (matches title, description, category)
     if (search && search.trim() !== '') {
-      const searchRegex = new RegExp(search.trim(), 'i');
+      const rawTerm = search.trim();
+      const sanitized = escapeRegex(rawTerm);
+      const words = rawTerm.split(/\s+/).filter(Boolean).map(escapeRegex);
+
       filter.$or = [
-        { title: { $regex: searchRegex } },
-        { description: { $regex: searchRegex } },
+        { title: { $regex: new RegExp(sanitized, 'i') } },
+        { description: { $regex: new RegExp(sanitized, 'i') } },
+        { category: { $regex: new RegExp(sanitized, 'i') } },
+        // Also match if every word appears in the title or description
+        { $and: words.map((w) => ({ title: { $regex: new RegExp(w, 'i') } })) },
+        { $and: words.map((w) => ({ description: { $regex: new RegExp(w, 'i') } })) },
       ];
     }
 
