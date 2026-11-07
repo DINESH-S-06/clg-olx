@@ -1,0 +1,20 @@
+{
+  "name": "clg-olx",
+  "version": "1.0.0",
+  "description": "Campus Marketplace (CLG OLX) - Full Stack Application",
+  "scripts": {
+    "start": "node backend/server.js",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install"
+  },
+  "keywords": [
+    "campus-marketplace",
+    "olx",
+    "college"
+  ],
+  "author": "",
+  "license": "ISC"
+}
